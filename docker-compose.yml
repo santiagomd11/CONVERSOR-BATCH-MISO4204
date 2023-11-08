@@ -1,0 +1,33 @@
+version: '3'
+services:
+  celery:
+    build: .
+    command: celery -A src.celery.celery_config.celery_app worker --loglevel=info
+    working_dir: /src
+    depends_on:
+      - rabbitmq
+    environment: 
+      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
+      - CELERY_RESULT_BACKEND=rpc://rabbitmq
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=miso4204
+      - POSTGRES_DB=miso4204db
+    networks:
+      - my_app_network
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - my_app_network
+
+networks:
+  my_app_network:
+    driver: bridge
