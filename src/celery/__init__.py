@@ -1,1 +1,1 @@
-from .celery_config import *
+from .celery import *
