@@ -11,7 +11,7 @@ from src.api import create_app, db
 
 
 from views import (
-    ViewUploadAndConvert,
+    ConvertFile
 )
 
 app = create_app('conversor-batch')
@@ -22,9 +22,9 @@ app_context.push()
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 api = Api(app)
-api.add_resource(ViewUploadAndConvert, '/upload')
+api.add_resource(ConvertFile, '/convert-file')
 jwt = JWTManager(app)
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5005)

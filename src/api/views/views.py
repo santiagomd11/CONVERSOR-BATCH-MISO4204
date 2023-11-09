@@ -16,16 +16,10 @@ from sqlalchemy.orm import sessionmaker
 
 from models import (
     db,
-    User,
-    UserSchema,
     Task,
-    TaskSchema,
     FileExtensions,
     ConversionFile
 )
-
-user_schema = UserSchema()
-task_schema = TaskSchema()
 
 NFS_PATH = '/nfs/general'
 
@@ -67,25 +61,21 @@ def convert_video_async(filename, target_format, current_user_id):
     db.session.commit()
 
 
-class ViewUploadAndConvert(Resource):
-    @jwt_required()
-    def get(self):
-        auth_token = request.headers.get('Authorization')
-        current_user_id = get_jwt_identity() 
-        if not auth_token:
-            return {'message': 'Token de autenticación inválido'}, 401 
-        
+class ConvertFile(Resource):
+    def post(self):
+        # Get the uploaded file and additional data
         file = request.files['file']
         target_format = request.form['target_format']
+        current_user_id = request.form['current_user_id']
         
-        if target_format.lower() not in [e.value for e in FileExtensions]:
-            return {'message': 'Formato de destino no admitido'}, 400 
-        
-        
+        # Save the file
         filename = secure_filename(file.filename)
-        file.save(filename)
-
-        p = multiprocessing.Process(target=convert_video_async, args=(filename, target_format, current_user_id))
+        file_path = os.path.join(NFS_PATH, filename)
+        file.save(file_path)
+        
+        # Start the conversion process using multiprocessing
+        p = multiprocessing.Process(target=convert_video_async, args=(file_path, target_format, current_user_id))
         p.start()
 
-        return {'message': 'La conversión se ha iniciado de manera asíncrona.'}, 200
+        # Respond that the conversion has been started
+        return {'message': 'Conversion started asynchronously'}, 202

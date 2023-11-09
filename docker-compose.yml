@@ -1,5 +1,16 @@
 version: '3'
 services:
+  batch-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    networks:
+      - my_app_network
+    volumes:
+    - /nfs/general:/nfs/general 
+
   celery:
     build: .
     command: celery -A src.celery.celery_config.celery_app worker --loglevel=info
@@ -16,6 +27,8 @@ services:
       - POSTGRES_DB=miso4204db
     networks:
       - my_app_network
+    volumes:
+    - /nfs/general:/nfs/general 
 
   rabbitmq:
     image: "rabbitmq:management"
@@ -27,7 +40,9 @@ services:
       - RABBITMQ_DEFAULT_PASS=guest
     networks:
       - my_app_network
+    volumes:
+    - /nfs/general:/nfs/general      
 
 networks:
   my_app_network:
-    driver: bridge
+    external: true
