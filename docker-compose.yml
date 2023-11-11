@@ -6,8 +6,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5005:5005"
-    networks:
-      - my_app_network
+    environment: 
+      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
+      - CELERY_RESULT_BACKEND=rpc://rabbitmq
+      - POSTGRES_HOST=34.83.179.230
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=miso4204
+      - POSTGRES_DB=miso4204db
     volumes:
     - /nfs/general:/nfs/general 
 
@@ -20,13 +26,11 @@ services:
     environment: 
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
       - CELERY_RESULT_BACKEND=rpc://rabbitmq
-      - POSTGRES_HOST=localhost
+      - POSTGRES_HOST=34.83.179.230
       - POSTGRES_PORT=5432
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=miso4204
       - POSTGRES_DB=miso4204db
-    networks:
-      - my_app_network
     volumes:
     - /nfs/general:/nfs/general 
 
@@ -38,11 +42,5 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
-    networks:
-      - my_app_network
     volumes:
     - /nfs/general:/nfs/general      
-
-networks:
-  my_app_network:
-    external: true

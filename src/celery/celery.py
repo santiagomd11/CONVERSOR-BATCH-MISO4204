@@ -3,6 +3,7 @@ from datetime import datetime
 from moviepy.editor import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import os
 
 from src.api.models import (
     Task,
@@ -27,7 +28,13 @@ celery_app.conf.update(
 
 NFS_PATH = '/nfs/general'
 
-db_engine = create_engine('postgresql://admin:miso4204@db:5432/miso4204db')
+POSTGRES_HOST = os.environ.get('POSTGRES_HOST')
+POSTGRES_PORT = os.environ.get('POSTGRES_PORT')
+POSTGRES_DB = os.environ.get('POSTGRES_DB')
+POSTGRES_USER = os.environ.get('POSTGRES_USER')
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+
+db_engine = create_engine(f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}')
 Session = sessionmaker(bind=db_engine)
 
 @celery_app.task
