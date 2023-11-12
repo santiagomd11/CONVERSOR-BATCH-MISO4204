@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5005:5005"
+      - "80:5005"
     environment: 
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
       - CELERY_RESULT_BACKEND=rpc://rabbitmq
