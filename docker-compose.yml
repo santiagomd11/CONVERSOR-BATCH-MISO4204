@@ -9,7 +9,7 @@ services:
     environment: 
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
       - CELERY_RESULT_BACKEND=rpc://rabbitmq
-      - POSTGRES_HOST=34.83.179.230
+      - POSTGRES_HOST=10.107.176.3
       - POSTGRES_PORT=5432
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=miso4204
@@ -26,7 +26,7 @@ services:
     environment: 
       - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
       - CELERY_RESULT_BACKEND=rpc://rabbitmq
-      - POSTGRES_HOST=34.83.179.230
+      - POSTGRES_HOST=10.107.176.3
       - POSTGRES_PORT=5432
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=miso4204
