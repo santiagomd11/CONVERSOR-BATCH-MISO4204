@@ -31,3 +31,4 @@ Werkzeug==2.0.1
 psycopg2-binary==2.9.9
 moviepy==1.0.3
 celery==5.2.1
+google-cloud-storage==2.13.0

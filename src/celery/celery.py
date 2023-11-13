@@ -4,6 +4,8 @@ from moviepy.editor import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
+from google.cloud import storage
+import tempfile
 
 from src.api.models import (
     Task,
@@ -37,26 +39,40 @@ POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 db_engine = create_engine(f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}')
 Session = sessionmaker(bind=db_engine)
 
+GCP_BUCKET_NAME = 'conversor-bucket'
+
 @celery_app.task
 def convert_video_async(filename, target_format, current_user_id):
-    session = Session()
-    video = VideoFileClip(filename)
-    original_extension = filename.split('.')[1]
-    converted_file_name = filename.split('.')[0] + '_converted' + '.' + target_format.lower()
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(GCP_BUCKET_NAME)
 
-    converted_file_path = os.path.join(NFS_PATH, converted_file_name)
+    with tempfile.NamedTemporaryFile(suffix=filename, delete=False) as temp_file:
+        blob = bucket.blob(f'videos/{filename}')
+        blob.download_to_filename(temp_file.name)
 
-    video.write_videofile(str(converted_file_path))
-    
+        video = VideoFileClip(temp_file.name)
+        converted_file_name = f'{filename.rsplit(".", 1)[0]}_converted.{target_format.lower()}'
+        converted_file_path = tempfile.mktemp(suffix=converted_file_name)
+
+        video.write_videofile(str(converted_file_path))
+
+    converted_blob = bucket.blob(f'videos/{converted_file_name}')
+    converted_blob.upload_from_filename(converted_file_path)
+
     timestamp = datetime.now()
     file_status = "processed"
     conversion_task = ConversionFile(file_name=converted_file_name, timestamp=timestamp, status=file_status)
-    session.add(conversion_task)
-    session.commit()
     
-    task = Task(original_file_name=filename, original_file_extension=FileExtensions(original_extension.lower()),
-                converted_file_extension=FileExtensions(target_format.lower()), is_available=True,
-                original_file_url=filename, converted_file_url=converted_file_name,
-                user_id=current_user_id, conversion_file=conversion_task)
-    session.add(task)
-    session.commit()
+    with Session() as session:
+        session.add(conversion_task)
+        session.commit()
+    
+        task = Task(original_file_name=filename, original_file_extension=FileExtensions(filename.split('.')[-1].lower()),
+                    converted_file_extension=FileExtensions(target_format.lower()), is_available=True,
+                    original_file_url=f'videos/{filename}', converted_file_url=f'videos/{converted_file_name}',
+                    user_id=current_user_id, conversion_file=conversion_task)
+        session.add(task)
+        session.commit()
+
+    os.remove(temp_file.name)
+    os.remove(converted_file_path)

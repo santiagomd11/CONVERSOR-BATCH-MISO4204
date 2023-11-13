@@ -19,18 +19,12 @@ NFS_PATH = '/nfs/general'
 
 class ConvertFile(Resource):
     def post(self):
-        # Get the uploaded file and additional data
         file = request.files['file']
         target_format = request.form['target_format']
         current_user_id = request.form['current_user_id']
-        
-        # Save the file
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(NFS_PATH, filename)
-        file.save(file_path)
-        
-        # Start the conversion process using multiprocessing
-        convert_video_async.delay(file_path, target_format, current_user_id)
 
-        # Respond that the conversion has been started
+        filename = secure_filename(file.filename)
+
+        convert_video_async.delay(filename, target_format, current_user_id)
+
         return {'message': 'Conversion started asynchronously'}, 202
