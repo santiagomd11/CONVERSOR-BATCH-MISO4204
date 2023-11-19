@@ -2,11 +2,17 @@ from google.cloud import pubsub_v1
 import json
 import os
 from datetime import datetime
-from moviepy.editor import VideoFileClip
-from sqlalchemy import create_engine, sessionmaker
+from moviepy.editor import *
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from google.cloud import storage
 import tempfile
-from src.api.models import Task, FileExtensions, ConversionFile
+
+from src.api.models import (
+    Task,
+    FileExtensions,
+    ConversionFile
+)
 
 POSTGRES_USER = os.getenv('POSTGRES_USER')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
