@@ -19,7 +19,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python -u src/workers/subscriber.py
+    command: python -u src/api/workers/subscriber.py
     working_dir: /src
     environment: 
       - POSTGRES_HOST=10.107.176.3
