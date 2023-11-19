@@ -1,25 +1,10 @@
 version: '3'
 services:
-  batch-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "80:5005"
-    environment: 
-      - POSTGRES_HOST=10.107.176.3
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=miso4204
-      - POSTGRES_DB=miso4204db
-    volumes:
-    - /nfs/general:/nfs/general 
-
   subscriber:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python -u src/api/workers/subscriber.py
+    command: python -u src/workers/subscriber.py
     working_dir: /src
     environment: 
       - POSTGRES_HOST=10.107.176.3
@@ -27,5 +12,3 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=miso4204
       - POSTGRES_DB=miso4204db
-    volumes:
-    - /nfs/general:/nfs/general 

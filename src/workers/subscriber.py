@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 from google.cloud import storage
 import tempfile
 
-from src.api.models import (
+from src.models import (
     Task,
     FileExtensions,
     ConversionFile
