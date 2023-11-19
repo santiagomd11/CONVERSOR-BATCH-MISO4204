@@ -11,6 +11,7 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from src.utils.pubsub import publish_to_pubsub
 
 
 from src.celery.celery import convert_video_async
@@ -25,6 +26,6 @@ class ConvertFile(Resource):
 
         filename = secure_filename(file.filename)
 
-        convert_video_async.delay(filename, target_format, current_user_id)
-
+        publish_to_pubsub(filename, target_format, current_user_id)
+        
         return {'message': 'Conversion started asynchronously'}, 202
