@@ -1,46 +1,14 @@
 version: '3'
 services:
-  batch-api:
+  subscriber:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "80:5005"
-    environment: 
-      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
-      - CELERY_RESULT_BACKEND=rpc://rabbitmq
-      - POSTGRES_HOST=10.107.176.3
-      - POSTGRES_PORT=5432
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=miso4204
-      - POSTGRES_DB=miso4204db
-    volumes:
-    - /nfs/general:/nfs/general 
-
-  celery:
-    build: .
-    command: celery -A src.celery.celery.celery_app worker --loglevel=info
+    command: python -u src/workers/subscriber.py
     working_dir: /src
-    depends_on:
-      - rabbitmq
     environment: 
-      - CELERY_BROKER_URL=pyamqp://guest:guest@rabbitmq//
-      - CELERY_RESULT_BACKEND=rpc://rabbitmq
       - POSTGRES_HOST=10.107.176.3
       - POSTGRES_PORT=5432
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=miso4204
       - POSTGRES_DB=miso4204db
-    volumes:
-    - /nfs/general:/nfs/general 
-
-  rabbitmq:
-    image: "rabbitmq:management"
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
-    volumes:
-    - /nfs/general:/nfs/general      
