@@ -12,4 +12,4 @@ ENV PYTHONPATH /src
 
 EXPOSE 5005
 
-CMD ["python", "src/api/app.py"]
+CMD ["python", "src/workers/subscriber.py"]
