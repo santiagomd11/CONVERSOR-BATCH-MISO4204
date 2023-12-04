@@ -10,6 +10,6 @@ RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
 ENV PYTHONPATH /src
 
-EXPOSE 5005
+EXPOSE 8080
 
-CMD ["python", "src/workers/subscriber.py"]
+CMD ["python", "src/app.py"]
